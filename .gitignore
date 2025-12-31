@@ -1,0 +1,34 @@
+# ===============================
+# STM32CubeIDE / Eclipse
+# ===============================
+
+# Build output
+Debug/
+Release/
+build/
+**/Debug/
+**/Release/
+
+# Object files & binaries
+*.o
+*.a
+*.so
+*.d
+*.elf
+*.hex
+*.bin
+*.map
+*.list
+
+# Eclipse / CubeIDE workspace noise
+.metadata/
+.settings/
+*.launch
+
+# macOS
+.DS_Store
+
+# Temporary / editor files
+*~
+*.swp
+.osx.project
