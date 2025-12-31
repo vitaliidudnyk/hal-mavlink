@@ -13,73 +13,48 @@ The design focuses on:
 - predictable real-time behavior
 - debuggability under high data rates
 
----
-
-## System Diagram (ASCII)
-
-+-------------------+
-| ArduPilot SITL |
-| (PC) |
-+-------------------+
-|
-| MAVLink (UDP)
-v
-+-------------------+
-| MAVProxy |
-| |
-| --out USB-UART |
-+-------------------+
-|
-| USB-UART
-v
-+-------------------+
-| ESP32 |
-| |
-| UART RX <- PC |
-| UART TX -> STM32 |
-+-------------------+
-|
-| UART (DMA RX)
-v
-+---------------------------------+
-| STM32 |
-| |
-| [UART RX DMA - Circular] |
-| | |
-| v |
-| Software Ring Buffer |
-| | |
-| v |
-| MAVLink Parser |
-| | |
-| v |
-| Telemetry State |
-| (HB, Battery, GPS) |
-| | |
-| v |
-| Health Rules (OK/WARN/CRIT) |
-| | |
-| v |
-| 1 Hz Compressed Logs |
-+---------------------------------+
-|
-| UART TX
-v
-+-------------------+
-| ESP32 |
-| UDP Logger |
-+-------------------+
-|
-| UDP
-v
-+-------------------+
-| PC (nc / logs) |
-+-------------------+
-
-yaml
-Copy code
-
----
+ArduPilot SITL (PC)
+        |
+        | MAVLink (UDP)
+        v
+MAVProxy
+        |
+        | USB-UART
+        v
+ESP32
+        |
+        | UART
+        v
+STM32
+  |
+  | UART RX (DMA, circular)
+  v
+[ DMA Circular Buffer ]
+  |
+  v
+[ Software Ring Buffer ]
+  |
+  v
+[ MAVLink Parser ]
+  |
+  v
+[ Telemetry State ]
+  (Heartbeat, Battery, GPS)
+  |
+  v
+[ Health Rules ]
+  (OK / WARN / CRIT)
+  |
+  v
+[ 1 Hz Compressed Logs ]
+  |
+  | UART TX
+  v
+ESP32
+        |
+        | UDP
+        v
+PC (nc / logs)
 
 ## Core Modules
 
@@ -109,9 +84,6 @@ app/health_rules/
 health_rules.c
 - OK / WARN / CRIT evaluation
 
-yaml
-Copy code
-
 ---
 
 ## Example Output
@@ -121,16 +93,10 @@ Normal operation:
 [MAV_SUM] msgs=44 hb=1 link_dt=85ms hb_dt=278ms batt_mv=12100 top=0(1) 30(4) 74(4)
 [HEALTH ] lvl=OK sys=1 comp=1 armed=0
 
-yaml
-Copy code
-
 After MAVLink loss:
 
 [MAV_SUM] msgs=0 hb=0 link_dt=5092ms hb_dt=9128ms
 [HEALTH ] lvl=CRIT
-
-yaml
-Copy code
 
 ---
 
